@@ -5,13 +5,40 @@
       <title>Timestamp Microservice | freeCodeCamp.org</title>
       <link rel="shortcut icon" href="https://cdn.freecodecamp.org/universal/favicons/favicon-32x32.png" type="image/x-icon"/>
       <link href="https://fonts.googleapis.com/css?family=Roboto" rel="stylesheet" type="text/css">
-      <link href="style.css" rel="stylesheet" type="text/css">
+      <link href="style.css" rel="stylesheet" type="text/css">     
    </head>
 
    <body>
     <h1>Timestamp Microservice</h1>
     <hr />
     <div class="container">
+      <h2>Please enter a date (i.e. 2015-12-25)</h2>
+      <input type="text" placeholder="YYYY-MM-DD" id="dateInput"> <br>
+      <button type="button" onclick="getDate();">Click to Get Unix and UTC</button><button       onclick="document.getElementById('dateInput').value = ''"> Reset </button>
+      <h2>OR Enter a unix date/time (i.e. 1451001600000)</h2>
+      <input type="text" placeholder="1451001600000" id="unixInput"> <br>
+      <button type="button" onclick="getUnix();">Click to Get Unix and UTC</button><button       onclick="document.getElementById('unixInput').value = ''"> Reset </button>
+      <script type="text/javascript">
+        function getDate() {
+         // Selecting the input element and get its value 
+          let dateVal = document.getElementById("dateInput").value;
+                   
+          //using the value to create a URL
+          var apiUrl = 'https://boilerplate-project-timestamp.k4tiek3nt.repl.co/api/' + dateVal;
+          //opening the URL
+          window.open(apiUrl,'_self');
+        }
+        function getUnix() {
+           // Selecting the input element and get its value 
+          let unixVal = document.getElementById("unixInput").value;
+                   
+          //using the value to create a URL
+          var apiUrl = 'https://boilerplate-project-timestamp.k4tiek3nt.repl.co/api/' + unixVal;
+          //opening the URL
+          window.open(apiUrl,'_self');
+        }        
+      </script>
+      
       <h3>Example Usage:</h3>
       <ul>
         <li><a href="https://boilerplate-project-timestamp.k4tiek3nt.repl.co/api/2015-12-25">[project url]/api/2015-12-25</a></li>
@@ -22,7 +49,7 @@
       <p>
         <code>{"unix":1451001600000, "utc":"Fri, 25 Dec 2015 00:00:00 GMT"}</code>
       </p>
-    </div>
+    </div>     
     <div class="footer">
       <p>
         By <a href="https://www.freecodecamp.org/">freeCodeCamp.org</a>
