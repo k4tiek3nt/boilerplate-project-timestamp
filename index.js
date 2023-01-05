@@ -47,7 +47,7 @@ app.get("/api/:date?", function (req, res) {
       let unixTimeStamp = date.valueOf();
 
       //If Date in UTC String is not invalid (same as saying is valid)
-      if (timeStampInMs !== "Invalid Date") {
+      if (timeStampInMs !== "Invalid Date" && timeStampInMs !== "Invalid time value") {
         res.json({ //Return expected data in JSON Format
           unix: unixTimeStamp,
           utc: timeStampInMs
@@ -78,7 +78,7 @@ app.get("/api/:date?", function (req, res) {
       let unixTimeStamp = date.valueOf();
         
       //If Date in UTC String is not invalid (same as saying is valid)
-      if (timeStampInMs !== "Invalid Date") {
+      if (timeStampInMs !== "Invalid Date" && timeStampInMs !== "Invalid time value")  {
         res.json({ //Return expected data in JSON Format
           unix: unixTimeStamp,
           utc: timeStampInMs
