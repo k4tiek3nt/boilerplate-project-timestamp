@@ -29,95 +29,102 @@ app.get("/api/hello", function (req, res) {
 
 app.get("/api/:date?", function (req, res) {
   //User Input assigned to variable
-  let userDate = req.params.date;
+  var userDate = req.params.date;
   console.log("Entered Date " + userDate);
-  //Checking User Input is Valid Date
-  let checkDate = moment(userDate, 'YYYY-MM-DD', true).isValid();
-  console.log("Date moment " + checkDate);
+  //Checking User Input is in Expected Format
+  let checkDateFormat = moment(userDate, 'YYYY-MM-DD', true).isValid();
+  console.log("Date moment " + checkDateFormat);
+  //Checking Usere Input is a Date String or Unix TimeStamp. Unix TimeStamp fails this.
+  let dateToString = new Date(userDate).toString();
+  console.log("date to string " + dateToString);
 
-    //If the date is valid...
-    if(checkDate){
-      //Then assign to new Date 
-      let date = new Date(userDate);
-      console.log("Date is valid " + date);
-      //Convert new Date to UTC String
-      let timeStampInMs = date.toUTCString();
-      console.log("TimeStamp is defined " + timeStampInMs);
-      //Get Unix Timestamp from the value of the new Date
-      let unixTimeStamp = date.valueOf();
+  //Process to follow if userDate is YYYY-MM-DD
+  if (checkDateFormat){
+    //Convert userDate to new Date Object
+    let newDate = new Date(userDate);
+    
+    //Convert new Date to UTC String
+    let timeStampInMs = newDate.toUTCString();
+    console.log("TimeStamp is defined " + timeStampInMs);
+    
+    //Get Unix Timestamp from the value of the new Date
+    let unixTimeStamp = Date.parse(userDate); //changed from newDate.valueOf();
 
-      //If Date in UTC String is not invalid (same as saying is valid)
-      if (timeStampInMs !== "Invalid Date" && timeStampInMs !== "Invalid time value") {
-        res.json({ //Return expected data in JSON Format
-          unix: unixTimeStamp,
-          utc: timeStampInMs
-        });
-      } else { // if date in UTC string is invalid, return that it is invalid
-        res.json({
-          error : "Invalid Date"
-        });      
-      } 
-    } else { //If date was not valid, this assumes is Unix Timestamp
-      //Formats the Unix Timestamp to MM/DD/YYYY
-      let unixDateFormatted = new Intl.DateTimeFormat('en-US', { year: 'numeric', month: '2-digit', 
-        day: '2-digit' }).format(userDate);
-        console.log(unixDateFormatted);
-      //Checks that date was formatted, which will fail if is not a Unix Timestamp
-      let checkUnixDate = moment(unixDateFormatted, 'MM/DD/YYYY', true).isValid();
-      console.log("Date moment " + checkUnixDate);
+    //Return expected data in JSON Format
+    res.json({ unix: unixTimeStamp, utc: timeStampInMs });
+  } 
 
-      //If passes check that date was formatted...
-      if(checkUnixDate){
-      //Then get new Date from formatted Unix Date
-      let date = new Date(unixDateFormatted);
-      console.log("Date is valid " + date);
-      //Convert new Date to UTC String
-      let timeStampInMs = date.toUTCString();
-      console.log("TimeStamp is defined " + timeStampInMs);
-      //Get Unix Timestamp from the value of the new Date  
-      let unixTimeStamp = date.valueOf();
-        
-      //If Date in UTC String is not invalid (same as saying is valid)
-      if (timeStampInMs !== "Invalid Date" && timeStampInMs !== "Invalid time value")  {
-        res.json({ //Return expected data in JSON Format
-          unix: unixTimeStamp,
-          utc: timeStampInMs
-        });
-      } else { // if date in UTC string is invalid, return that it is invalid
-        res.json({
-          error : "Invalid Date"
-        });      
-      }    
+  //Process to follow if userDate was a date string and not YYYY-MM-DD or Unix Timestamp
+  if (!checkDateFormat && dateToString !== 'Invalid Date') {
+    //Formats a Date String to ISO Date without time (YYYY-MM-DD)
+    let dateStringFormatted = new Date(dateToString).toISOString().substring(0,10);
+    console.log("Date String Formatted " + dateStringFormatted); 
+    
+    //Convert dateStringFormatted to new Date Object
+    let newDate = new Date(dateStringFormatted);
+    
+    //Convert new Date to UTC String
+    let timeStampInMs = newDate.toUTCString();
+    console.log("TimeStamp is defined " + timeStampInMs);
+    
+    //Get Unix Timestamp from the value of the new Date
+    let unixTimeStamp = Date.parse(newDate);
+
+    //Return expected data in JSON Format
+    res.json({ unix: unixTimeStamp, utc: timeStampInMs });     
+  }
+  
+  //Process to follow if Date is not YYYY-MM-DD, is not null, and dateToString is invalid
+  //Which all should mean the date is potentially a unix date format
+  if (!checkDateFormat && userDate != null && dateToString == 'Invalid Date'){
+    
+    //Confirm the date about to be used is a date when treated as a number, otherwise it's not a unix date
+    let checkValidDate = new Date(parseInt(userDate));
+    console.log("Check if valid date " + checkValidDate);
+
+    //Confirms date was not invalid, assumes is a Unix Timestamp at this point
+    if (checkValidDate != "Invalid Date"){
+      //Formats a Unix Timestamp to ISO Date without time (YYYY-MM-DD)
+    let unixDateFormatted = new Date(parseInt(userDate)).toISOString().substring(0,10);
+    console.log("Unix Date Formatted " + unixDateFormatted); 
+    
+    //Convert unixDateFormatted to new Date Object
+    let newDate = new Date(unixDateFormatted);
+    
+    //Convert new Date to UTC String
+    let timeStampInMs = newDate.toUTCString();
+    console.log("TimeStamp is defined " + timeStampInMs);
+    
+    //Get Unix Timestamp from the value of the new Date
+    let unixTimeStamp = Date.parse(newDate);
+
+    //Return expected data in JSON Format
+    res.json({ unix: unixTimeStamp, utc: timeStampInMs }); 
+    } else{ //If date was invalid, it isn't a Unix Date and must be an invalid date
+      res.json({
+        error : "Invalid Date"
+       }); 
     }
+    
   }
-});
+  
+  //Process to follow if userDate is null
+  if (userDate == null) {
+    
+  //Get new Date Object, because userDate is null
+  let newDate = new Date();
+  
+  //Convert new Date to UTC String
+  let timeStampInMs = newDate.toUTCString();
+  console.log("TimeStamp is defined " + timeStampInMs);
+  
+  //Get Unix Timestamp from the value of the new Date
+  let unixTimeStamp = newDate.valueOf();
 
-app.get("/api/ ", function (req, res) {
-  
-  let date = new Date();
-  console.log("Date is valid " + date);
-  let timeStampInMs = date.toUTCString();
-  console.log("TimeStamp is defined " + timeStampInMs); 
-  let unixTimeStamp = date.valueOf();
-  
-  if (timeStampInMs !== "Invalid Date") {
-    res.json({
-      unix: unixTimeStamp,
-      utc: timeStampInMs
-    });
-  } else {
-    res.json({
-      error : "Invalid Date"
-    });      
+  //Return expected data in JSON Format
+  res.json({ unix: unixTimeStamp, utc: timeStampInMs });
   }
-});
-
-app.get("/api/2015-12-25", function (req, res) {
-  res.json({"unix":1451001600000,"utc":"Fri, 25 Dec 2015 00:00:00 GMT"});
-});
-
-app.get("/api/1451001600000", function (req, res) {
-  res.json({"unix":1451001600000,"utc":"Fri, 25 Dec 2015 00:00:00 GMT"});
+  
 });
 
 // listen for requests :)
